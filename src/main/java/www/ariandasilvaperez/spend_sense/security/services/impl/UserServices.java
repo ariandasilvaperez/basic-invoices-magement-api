@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import www.ariandasilvaperez.spend_sense.security.exceptions.UserNotFoundException;
 import www.ariandasilvaperez.spend_sense.security.models.User;
 import www.ariandasilvaperez.spend_sense.security.models.dto.UserDTO;
 import www.ariandasilvaperez.spend_sense.security.repository.IUserRepository;
@@ -21,7 +22,7 @@ public class UserServices implements IUserServices {
         }
         String email = authentication.getName();
         return userRepository.findByEmail(email).orElseThrow(()->{
-            return new RuntimeException("User not found in the database");
+            return new UserNotFoundException("User not found in the database");
         });
     }
 
@@ -34,5 +35,34 @@ public class UserServices implements IUserServices {
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .build();
+    }
+
+    @Override
+    public UserDTO updateUser(Long id, UserDTO user){
+        User userExists = userRepository.findById(id).orElseThrow(()->{
+            return new UserNotFoundException("User not found with id" + id);
+        });
+
+        if (user.getFirstName() != null){
+            userExists.setFirstName(user.getFirstName());
+        }
+
+        if (user.getLastName() != null){
+            userExists.setLastName(user.getLastName());
+        }
+
+        if (user.getUsername() != null){
+            userExists.setUsername(user.getUsername());
+        }
+
+        if (user.getEmail() != null){
+            userExists.setEmail(user.getEmail());
+        }
+
+        if (user.getSpended() != null){
+            userExists.setSpended(user.getSpended());
+        }
+
+        return toDTO(userRepository.save(userExists));
     }
 }

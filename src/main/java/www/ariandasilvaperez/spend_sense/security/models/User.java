@@ -26,4 +26,6 @@ public class User {
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "spended", nullable = true)
+    private Double spended;
 }

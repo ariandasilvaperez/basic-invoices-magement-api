@@ -24,4 +24,5 @@ public class UserDTO {
     @NotEmpty(message = "Password cant be empty or null")
     @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?=.*[a-zA-Z]).{8,16}$", message = "Invalid password format")
     private String password;
+    private Double spended;
 }

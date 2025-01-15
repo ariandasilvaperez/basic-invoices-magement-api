@@ -42,6 +42,7 @@ public class AuthServicesImpl implements IAuthServices {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .spended(user.getSpended())
                 .build();
         User userRegistred = userRepository.save(userEntity);
         return UserDTO.builder()
@@ -50,6 +51,7 @@ public class AuthServicesImpl implements IAuthServices {
                 .lastName(userRegistred.getLastName())
                 .email(userRegistred.getEmail())
                 .password(userRegistred.getPassword())
+                .spended(user.getSpended())
                 .build();
     }
 

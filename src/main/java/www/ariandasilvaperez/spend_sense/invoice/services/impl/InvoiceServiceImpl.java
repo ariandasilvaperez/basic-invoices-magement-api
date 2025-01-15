@@ -130,6 +130,8 @@ public class InvoiceServiceImpl implements IInvoiceServices {
     @Override
     public InvoiceDTO addInvoice(InvoiceDTO invoice, Authentication authentication) {
         User user = userServices.getCurrentUser(authentication);
+        Double userSpended = user.getSpended();
+
         Boolean invoiceExists = invoiceRepository.existsByUserAndInvoiceNumber(user, invoice.getInvoiceNumber());
         if (invoiceExists){
             throw new InvoiceAlreadyExistsException("Invoice with this invoice number already exists");
@@ -137,6 +139,9 @@ public class InvoiceServiceImpl implements IInvoiceServices {
 
         Invoice invoiceEntity = toEntity(invoice, authentication);
         Invoice invoiceSaved = invoiceRepository.save(invoiceEntity);
+        userSpended = invoiceSaved.getTotalAmount() + userSpended;
+        user.setSpended(userSpended);
+        userServices.updateUser(user.getId(), userServices.toDTO(user));
         return toDTO(invoiceSaved);
     }
     
@@ -167,11 +172,15 @@ public class InvoiceServiceImpl implements IInvoiceServices {
     @Override
     public void deleteInvoice(Long id, Authentication authentication){
         User user = userServices.getCurrentUser(authentication);
+        Double userSpended = user.getSpended();
         Invoice invoiceExists = invoiceRepository.findByUserAndId(user, id).orElseThrow( () ->{
             return new InvoiceNotFoundException("Invoice not found with id " + id);
         });
 
         invoiceRepository.delete(invoiceExists);
+        userSpended = invoiceExists.getTotalAmount() - userSpended;
+        user.setSpended(userSpended);
+        userServices.updateUser(user.getId(), userServices.toDTO(user));
     }
 
 
